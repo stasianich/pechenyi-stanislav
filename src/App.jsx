@@ -1,16 +1,46 @@
-import React from 'react';
-import { TodoList } from './TodoList/TodoList';
+import React, { useEffect, useState } from 'react';
+import { getTodos } from './api/request';
+import { AddTodoForm } from './components/AddTodoForm';
+import { TodoList } from './components/TodoList';
+import './App.scss';
 
-class App extends React.Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App__sidebar">
-          <TodoList />
-        </div>
-      </div>
-    );
-  }
-}
+const App = () => {
+  const [todos, setTodos] = useState([]);
+
+  const addTodo = (
+    userId,
+    title,
+    completed,
+  ) => {
+    const newTodo = {
+      userId: +userId,
+      id: (todos.length + 1),
+      title,
+      completed,
+    };
+
+    setTodos([newTodo, ...todos]);
+  };
+
+  const deleteTodo = (id) => {
+    const preparedTodos = todos.filter(todo => todo.id !== id);
+
+    setTodos(preparedTodos);
+  };
+
+  useEffect(() => {
+    (async() => setTodos(await getTodos()))();
+  }, []);
+
+  return (
+    <div className="App">
+      <AddTodoForm onAdd={addTodo} />
+      <TodoList
+        todos={todos}
+        onDelete={deleteTodo}
+      />
+    </div>
+  );
+};
 
 export default App;
